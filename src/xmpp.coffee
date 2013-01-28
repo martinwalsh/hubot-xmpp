@@ -119,6 +119,8 @@ class XmppBot extends Adapter
     [room, from] = stanza.attrs.from.split '/'
     @robot.logger.debug "Received message: #{message} in room: #{room}, from: #{from}"
 
+    @emit 'XmppBot_readMessage', room, from, message
+
     # ignore our own messages in rooms
     return if from == @robot.name or from == @options.username or from is undefined
 
@@ -191,6 +193,8 @@ class XmppBot extends Adapter
 
         @robot.logger.debug "Availability received for #{from}"
 
+        @emit 'XmppBot_available', room, from
+
         user = @userForId from, room: room, jid: jid.toString()
         @receive new EnterMessage user
 
@@ -206,6 +210,8 @@ class XmppBot extends Adapter
         return if from == @robot.name or from == @options.username
 
         @robot.logger.debug "Unavailability received for #{from}"
+
+        @emit 'XmppBot_unavailable', room, from
 
         user = @userForId from, room: room, jid: jid.toString()
         @receive new LeaveMessage(user)
